@@ -41,7 +41,7 @@ $SkillsSrc = Join-Path $RepoDir 'skills'
 
 $ToolPaths = @{
     'claude-code'       = Join-Path $env:USERPROFILE '.claude\skills'
-    'opencode'          = Join-Path $env:APPDATA 'opencode\skill'
+    'opencode'          = Join-Path $env:APPDATA 'opencode\skills'
     'opencode-commands' = Join-Path $env:APPDATA 'opencode\commands'
     'gemini-cli'        = Join-Path $env:USERPROFILE '.gemini\skills'
     'codex'             = Join-Path $env:USERPROFILE '.codex\skills'
