@@ -98,56 +98,14 @@ rules:
 
 ### Step 4: Build Skill Registry
 
-Build a registry of available skills so sub-agents can discover and load them. Scan TWO sources:
+Follow the same logic as the `skill-registry` skill (`skills/skill-registry/SKILL.md`):
 
-#### A. User Coding Skills
+1. Scan user skills: glob `*/SKILL.md` in the skills directory, skip `sdd-*`, `_shared`, `skill-registry`. Read frontmatter triggers.
+2. Scan project conventions: check for `agents.md`, `AGENTS.md`, `CLAUDE.md` (project-level), `.cursorrules`, `GEMINI.md`, `copilot-instructions.md` in the project root.
+3. **ALWAYS write `.atl/skill-registry.md`** in the project root (create `.atl/` if needed). This file is mode-independent — it's infrastructure, not an SDD artifact.
+4. If engram is available, **ALSO save to engram**: `mem_save(title: "skill-registry", topic_key: "skill-registry", type: "config", project: "{project}", content: "{registry markdown}")`
 
-1. Glob for `*/SKILL.md` files in the user's skills directory (try `~/.claude/skills/`, `~/.config/opencode/skills/`, or the parent directory of this skill file)
-2. **SKIP `sdd-*` and `_shared`** — those are SDD workflow skills, not coding skills
-3. Read only the frontmatter (first 10 lines) to extract the `description` field
-4. Extract the trigger text (after "Trigger:" in the description)
-
-#### B. Project Conventions Index
-
-1. Check the project root for a conventions index file. Look for (in priority order):
-   - `agents.md`
-   - `AGENTS.md`
-   - `CLAUDE.md` (only if it's a project-level file, not the user's global one)
-   - `.cursorrules`
-   - `GEMINI.md`
-   - `copilot-instructions.md`
-2. If found, record its path — this file is the project's master skill/convention index
-
-#### C. Save the Registry
-
-```
-mem_save(
-  title: "skill-registry",
-  topic_key: "skill-registry",
-  type: "config",
-  project: "{project-name}",
-  content: "# Skill Registry
-
-Available skills for sub-agents. Load relevant ones BEFORE writing code.
-
-## User Coding Skills
-| Trigger | Skill | Path |
-|---------|-------|------|
-| React components, hooks, JSX | react-19 | ~/.claude/skills/react-19/SKILL.md |
-| TypeScript types, interfaces | typescript | ~/.claude/skills/typescript/SKILL.md |
-| ... | ... | ... |
-
-## Project Conventions
-| File | Path | Description |
-|------|------|-------------|
-| agents.md | ./agents.md | Project master index — read for project-specific conventions |
-"
-)
-```
-
-`topic_key: "skill-registry"` ensures this upserts — re-running sdd-init updates the same observation.
-
-If no coding skills or project index are found, save an empty registry (so sub-agents don't waste time searching).
+See `skills/skill-registry/SKILL.md` for the full registry format and scanning details.
 
 ### Step 5: Persist Project Context
 

@@ -71,13 +71,23 @@ Before starting, load any existing project context and specs per the active conv
 
 ## What to Do
 
-### Step 1: Understand the Request
+### Step 1: Load Skill Registry
+
+**Do this FIRST, before any other work.**
+
+1. Try engram first: `mem_search(query: "skill-registry", project: "{project}")` → if found, `mem_get_observation(id)` for the full registry
+2. If engram not available or not found: read `.atl/skill-registry.md` from the project root
+3. If neither exists: proceed without skills (not an error)
+
+From the registry, identify and read any skills whose triggers match your task. Also read any project convention files listed in the registry.
+
+### Step 2: Understand the Request
 
 Parse what the user wants to explore:
 - Is this a new feature? A bug fix? A refactor?
 - What domain does it touch?
 
-### Step 2: Investigate the Codebase
+### Step 3: Investigate the Codebase
 
 Read relevant code to understand:
 - Current architecture and patterns
@@ -94,7 +104,7 @@ INVESTIGATE:
 └── Identify dependencies and coupling
 ```
 
-### Step 3: Analyze Options
+### Step 4: Analyze Options
 
 If there are multiple approaches, compare them:
 
@@ -103,7 +113,7 @@ If there are multiple approaches, compare them:
 | Option A | ... | ... | Low/Med/High |
 | Option B | ... | ... | Low/Med/High |
 
-### Step 4: Persist Artifact
+### Step 5: Persist Artifact
 
 **This step is MANDATORY when tied to a named change — do NOT skip it.**
 
@@ -114,7 +124,7 @@ mem_save(
   topic_key: "sdd/{change-name}/explore",
   type: "architecture",
   project: "{project}",
-  content: "{your full exploration markdown from Step 3}"
+  content: "{your full exploration markdown from Step 4}"
 )
 ```
 
@@ -129,13 +139,13 @@ mem_save(
 )
 ```
 
-If mode is `openspec` or `hybrid`: the file was already written in Step 3.
+If mode is `openspec` or `hybrid`: the file was already written in Step 4.
 
 If mode is `hybrid`: also call `mem_save` as above (write to BOTH backends).
 
 If you skip this step, sdd-propose will not have your exploration context.
 
-### Step 5: Return Structured Analysis
+### Step 6: Return Structured Analysis
 
 Return EXACTLY this format to the orchestrator (and write the same content to `exploration.md` if saving):
 

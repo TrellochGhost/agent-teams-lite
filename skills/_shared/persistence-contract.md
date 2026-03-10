@@ -125,31 +125,52 @@ and the pipeline BREAKS.
 
 ## Skill Registry
 
-`sdd-init` generates a skill registry in engram (`topic_key: "skill-registry"`) that lists all available coding skills with their triggers and file paths. This enables sub-agents to discover and load relevant skills for their task.
+The skill registry is a catalog of all available skills (user-level + project-level) that sub-agents read before starting any task. It is **infrastructure, not an SDD artifact** — it exists independently of any persistence mode.
+
+### Where the registry lives
+
+The registry is ALWAYS written to `.atl/skill-registry.md` in the project root, regardless of mode. If engram is available, it's ALSO saved there as a cross-session bonus.
+
+| Source | Location | Priority |
+|--------|----------|----------|
+| Engram | `topic_key: "skill-registry"` | Read FIRST (fast, cross-session) |
+| File | `.atl/skill-registry.md` | Fallback if engram not available |
+
+### How to generate/update
+
+Run the `skill-registry` skill, or run `sdd-init` (which includes registry generation).
 
 ### Sub-agent skill loading protocol
 
-Every sub-agent that writes or modifies code SHOULD check for coding skills before starting:
+**EVERY sub-agent MUST check the skill registry as its FIRST step**, before starting any work:
 
 ```
-1. mem_search(query: "skill-registry", project: "{project}") → get ID
-2. If found: mem_get_observation(id) → read the registry table
-3. Identify skills whose triggers match your task (e.g., React, TypeScript, testing)
-4. Read those specific SKILL.md files BEFORE writing code
-5. Follow their patterns and conventions
+1. Try engram first: mem_search(query: "skill-registry", project: "{project}")
+   → if found: mem_get_observation(id) → full registry
+2. If engram not available or not found: read .atl/skill-registry.md
+3. If neither exists: proceed without skills (not an error)
+4. From the registry, identify skills matching your task:
+   - Writing React code? → load react-19
+   - Reviewing a PR? → load pr-review
+   - Creating a Jira task? → load jira-task
+   - Writing tests? → load pytest/playwright
+5. Read those specific SKILL.md files
+6. Also read any project convention files listed in the registry
+7. THEN proceed with your actual task
 ```
 
-The orchestrator MUST include this instruction in sub-agent prompts that involve code writing:
+The orchestrator MUST include this instruction in ALL sub-agent prompts:
 ```
-SKILL LOADING:
-Before writing code, check for coding skills:
-  mem_search(query: "skill-registry", project: "{project}")
-If found, load and follow any skills relevant to your task.
+SKILL LOADING (do this FIRST):
+Check for available skills:
+  1. Try: mem_search(query: "skill-registry", project: "{project}")
+  2. Fallback: read .atl/skill-registry.md
+Load and follow any skills relevant to your task.
 ```
 
 ### When the registry doesn't exist
 
-If `mem_search` returns no results (sdd-init hasn't been run), the sub-agent proceeds without coding skills. This is not an error — skills are optional enhancement, not a requirement.
+If neither engram nor the file has a registry, the sub-agent proceeds without skills. This is not an error — skills are optional enhancement. Recommend the user run `/skill-registry` or `/sdd-init` to generate it.
 
 ## Detail Level
 

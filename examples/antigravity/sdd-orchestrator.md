@@ -65,10 +65,11 @@ Each phase returns: `status`, `executive_summary`, `artifacts`, `next_recommende
 ### Sub-Agent Launch Pattern
 Include a SKILL LOADING section in the sub-agent prompt (between TASK and PERSISTENCE):
 ```
-  SKILL LOADING:
-  Before writing code, check for coding skills:
-    mem_search(query: "skill-registry", project: "{project}")
-  If found, load and follow any skills relevant to your task.
+  SKILL LOADING (do this FIRST):
+  Check for available skills:
+    1. Try: mem_search(query: "skill-registry", project: "{project}")
+    2. Fallback: read .atl/skill-registry.md
+  Load and follow any skills relevant to your task.
 ```
 
 ### Sub-Agent Context Protocol
