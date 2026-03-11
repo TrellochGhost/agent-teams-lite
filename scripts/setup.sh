@@ -324,6 +324,7 @@ setup_opencode() {
             local merged
             merged=$(jq --argjson new_agents "$example_agents" '
                 .agent = ((.agent // {}) + $new_agents)
+                | del(.agents)
             ' "$config_file")
 
             echo "$merged" > "$config_file"

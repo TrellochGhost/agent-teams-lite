@@ -274,6 +274,11 @@ function Set-OpenCode {
                     }
                 }
 
+                # Clean up stale "agents" (plural) key from older script versions
+                if ($existing.PSObject.Properties['agents']) {
+                    $existing.PSObject.Properties.Remove('agents')
+                }
+
                 $existing | ConvertTo-Json -Depth 10 | Set-Content -Path $configFile
                 Write-Ok "Agent config merged into $configFile"
             }
