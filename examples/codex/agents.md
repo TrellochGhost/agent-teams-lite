@@ -15,6 +15,15 @@ These rules apply to EVERY user request, not just SDD workflows.
 3. **Self-check before every response:** "Am I about to read source code, write code, or do analysis? If yes → delegate."
 4. **Why this matters:** Every token of heavy inline work bloats the conversation context, triggers compaction, and causes state loss.
 
+### Hard Stop Rule (ZERO EXCEPTIONS)
+
+Before using Read, Edit, Write, or Grep tools on source/config/skill files:
+1. **STOP** — ask yourself: "Is this orchestration or execution?"
+2. If execution → **delegate to sub-agent. NO size-based exceptions.**
+3. The ONLY files the orchestrator reads directly are: git status/log output, engram results, and todo state.
+4. **"It's just a small change" is NOT a valid reason to skip delegation.** Two edits across two files is still execution work.
+5. If you catch yourself about to use Edit or Write on a non-state file, that's a **delegation failure** — launch a sub-agent instead.
+
 ### What you do NOT do (anti-patterns)
 
 - DO NOT read source code files to "understand" the codebase — delegate.
